@@ -1,8 +1,5 @@
 SRC_NAME=curl-8.6.0
-
-SRC_URL=https://github.com/curl/curl/releases/download/curl-8_6_0/curl-8.6.0.tar.xz
-
-LDFLAGS += -Wl,-rpath-link=$(STAGEDIR)/lib
+SRC_URL=https://github.com/curl/curl/releases/download/curl-8_6_0/$(SRC_NAME).tar.xz
 
 #all: download_test extract_test config_test
 all: config_test
@@ -15,8 +12,8 @@ download_test:
 
 extract_test:
 	( if [ ! -d $(SRC_NAME) ]; then \
-		tar xf $(SRC_NAME).tar.xz; \
-		patch -d $(SRC_NAME) -p1 -i ../no_docs_test.patch; \
+		tar xJf $(SRC_NAME).tar.xz; \
+		patch -d $(SRC_NAME) -p1 -i ../no_docs_tests.patch; \
 	fi )
 
 config_test:
@@ -26,19 +23,24 @@ config_test:
 		make configure && touch config_done; \
 	fi )
 
+
 configure:
 	( cd $(SRC_NAME) ; \
+	autoreconf -fi ; \
 	./configure \
-		--prefix=$(STAGEDIR) \
-		--enable-static \
+		--prefix= \
+		--disable-static \
+		--enable-openssl-auto-load-config \
 		--enable-shared \
 		$(if $(CONFIG_IPV6),--enable-ipv6,--disable-ipv6) \
 		--disable-gopher \
 		--disable-ldap \
 		--disable-ldaps \
+		--disable-rt \
 		--disable-rtsp \
 		--disable-telnet \
 		--disable-tftp \
+		--disable-smb \
 		--disable-smtp \
 		--disable-pop3 \
 		--disable-imap \
@@ -52,11 +54,35 @@ configure:
 		--disable-tls-srp \
 		--disable-libcurl-option \
 		--disable-threaded-resolver \
+		--disable-mqtt \
+		--disable-alt-svc \
+		--disable-hsts \
+		--without-brotli \
+		--disable-ntlm \
+		--without-hyper \
 		--without-gnutls \
-		--without-libidn \
+		--without-ca-path \
+		--without-ca-fallback \
+		--without-cyassl \
+		--without-default-ssl-backend \
+		--without-libidn2 \
+		--without-libpsl \
+		--without-librtmp \
+		--without-libssh \
 		--without-libssh2 \
 		--without-krb4 \
+		--with-nghttp2 \
+		--with-nghttp3 \
+		--with-ngtcp2 \
 		--without-nss \
+		--without-mbedtls \
+		--without-mesalink \
+		--without-polarssl \
+		--without-schannel \
+		--without-wolfssl \
+		--without-winidn \
+		--without-winssl \
+		--without-zsh-functions-dir \
 		--with-random=/dev/urandom \
 		--with-zlib=$(STAGEDIR) \
 		--with-ssl=$(STAGEDIR) \
@@ -67,12 +93,12 @@ configure:
 
 clean:
 	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) clean ; \
+		$(MAKE) -C $(SRC_NAME) distclean ; \
 	fi ; \
 	rm -f config_done
 
 install:
-	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
+	$(MAKE) -C $(SRC_NAME) install DESTDIR=$(STAGEDIR)
 
 romfs:
 ifeq ($(CONFIG_FIRMWARE_INCLUDE_CURL),y)
