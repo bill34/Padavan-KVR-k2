@@ -1,5 +1,5 @@
 SRC_NAME=openssl-3.2.1
-SRC_URL=https://www.openssl.org/source/$(SRC_NAME).tar.gz
+SRC_URL=https://github.com/openssl/openssl/releases/tag/$(SRC_NAME).tar.gz
 
 # openssl use CROSS_COMPILE prefix
 CC = gcc
