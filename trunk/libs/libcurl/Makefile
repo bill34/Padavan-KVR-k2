@@ -1,18 +1,12 @@
-SRC_NAME=curl-8.6.0
-SRC_URL=https://github.com/curl/curl/releases/download/curl-8_6_0/$(SRC_NAME).tar.xz
+SRC_NAME = smartdns-Release43
+THISDIR = $(shell pwd)
 
-#all: download_test extract_test config_test
-all: config_test
-	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
-
-download_test:
-	( if [ ! -f $(SRC_NAME).tar.xz ]; then \
-		wget -t5 --timeout=20 --no-check-certificate -O $(SRC_NAME).tar.xz $(SRC_URL); \
-	fi )
+all: extract_test config_test
+	$(MAKE) -C $(SRC_NAME)
 
 extract_test:
 	( if [ ! -d $(SRC_NAME) ]; then \
-		tar xJf $(SRC_NAME).tar.xz; \
+		tar xJf $(SRC_NAME).tar.gz; \
 		patch -d $(SRC_NAME) -p1 -i ../no_docs_tests.patch; \
 	fi )
 
